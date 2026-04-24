@@ -1,0 +1,228 @@
+---
+import MainLayout from '../layouts/main.astro';
+import NavBar from '../components/NavBar';
+---
+
+<MainLayout pageClass="debug">
+  <div class="min-h-screen bg-background grey-texture">
+    <NavBar client:load />
+
+    <div class="container mx-auto px-4 py-12">
+      <div class="max-w-4xl mx-auto">
+        <div class="mb-8">
+          <h1 class="text-4xl font-bold font-heading mb-4">System Diagnostics</h1>
+          <p class="text-muted-foreground">
+            Real-time health check of all system components
+          </p>
+        </div>
+
+        <div class="space-y-6">
+          <!-- Loading State -->
+          <div id="loading" class="bg-card border border-border rounded-lg p-6">
+            <div class="flex items-center gap-3">
+              <div class="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full"></div>
+              <p class="text-foreground">Running diagnostics...</p>
+            </div>
+          </div>
+
+          <!-- Results Container -->
+          <div id="results" class="hidden space-y-6"></div>
+
+          <!-- Refresh Button -->
+          <button
+            id="refresh-btn"
+            class="hidden w-full bg-primary text-primary-foreground hover:bg-primary/90 font-medium py-3 px-6 rounded-lg transition-colors"
+          >
+            🔄 Refresh Diagnostics
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</MainLayout>
+
+<script>
+  import { baseUrl } from '../lib/base-url';
+
+  async function runDiagnostics() {
+    const loadingEl = document.getElementById('loading');
+    const resultsEl = document.getElementById('results');
+    const refreshBtn = document.getElementById('refresh-btn');
+
+    if (!loadingEl || !resultsEl || !refreshBtn) return;
+
+    // Show loading
+    loadingEl.classList.remove('hidden');
+    resultsEl.classList.add('hidden');
+    refreshBtn.classList.add('hidden');
+
+    try {
+      const response = await fetch(`${baseUrl}/api/diagnostic`);
+      const data = await response.json();
+
+      // Hide loading
+      loadingEl.classList.add('hidden');
+      resultsEl.classList.remove('hidden');
+      refreshBtn.classList.remove('hidden');
+
+      // Build HTML
+      let html = '';
+
+      // Summary Card
+      html += `
+        <div class="bg-card border-2 ${data.summary.health.includes('✅') ? 'border-green-500' : 'border-yellow-500'} rounded-lg p-6">
+          <h2 class="text-2xl font-bold mb-4">${data.summary.health}</h2>
+          <div class="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <p class="text-3xl font-bold text-green-600">${data.summary.passed}</p>
+              <p class="text-sm text-muted-foreground">Passed</p>
+            </div>
+            <div>
+              <p class="text-3xl font-bold text-red-600">${data.summary.failed}</p>
+              <p class="text-sm text-muted-foreground">Failed</p>
+            </div>
+            <div>
+              <p class="text-3xl font-bold text-foreground">${data.summary.total_tests}</p>
+              <p class="text-sm text-muted-foreground">Total Tests</p>
+            </div>
+          </div>
+          <p class="text-xs text-muted-foreground mt-4">Last run: ${new Date(data.timestamp).toLocaleString()}</p>
+        </div>
+      `;
+
+      // Environment Variables
+      html += `
+        <div class="bg-card border border-border rounded-lg p-6">
+          <h3 class="text-xl font-bold mb-4">🔐 Environment Variables</h3>
+          <div class="space-y-2 font-mono text-sm">
+            ${Object.entries(data.tests.environment_variables).map(([key, value]) => `
+              <div class="flex justify-between items-center py-2 border-b border-border last:border-0">
+                <span class="text-muted-foreground">${key}</span>
+                <span class="${value.toString().includes('✅') ? 'text-green-600' : 'text-red-600'}">${value}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      // Supabase Connection
+      if (data.tests.supabase_connection) {
+        const status = data.tests.supabase_connection.status;
+        html += `
+          <div class="bg-card border border-border rounded-lg p-6">
+            <h3 class="text-xl font-bold mb-4">🗄️ Supabase Connection</h3>
+            <div class="space-y-2">
+              <p class="text-lg font-semibold ${status.includes('✅') ? 'text-green-600' : 'text-red-600'}">${status}</p>
+              ${data.tests.supabase_connection.message ? `<p class="text-foreground">${data.tests.supabase_connection.message}</p>` : ''}
+              ${data.tests.supabase_connection.error ? `<p class="text-red-600 font-mono text-sm">${data.tests.supabase_connection.error}</p>` : ''}
+              ${data.tests.supabase_connection.response_time ? `<p class="text-muted-foreground text-sm">Response time: ${data.tests.supabase_connection.response_time}</p>` : ''}
+            </div>
+          </div>
+        `;
+      }
+
+      // Supabase Tables
+      if (data.tests.supabase_tables) {
+        html += `
+          <div class="bg-card border border-border rounded-lg p-6">
+            <h3 class="text-xl font-bold mb-4">📊 Database Tables</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-muted p-4 rounded">
+                <p class="text-2xl font-bold">${data.tests.supabase_tables.users_count}</p>
+                <p class="text-sm text-muted-foreground">Users</p>
+              </div>
+              <div class="bg-muted p-4 rounded">
+                <p class="text-2xl font-bold">${data.tests.supabase_tables.portfolios_count}</p>
+                <p class="text-sm text-muted-foreground">Portfolios</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // R2 Bucket Access
+      if (data.tests.r2_bucket_access) {
+        const status = data.tests.r2_bucket_access.status;
+        html += `
+          <div class="bg-card border border-border rounded-lg p-6">
+            <h3 class="text-xl font-bold mb-4">☁️ Cloudflare R2 Storage</h3>
+            <div class="space-y-2">
+              <p class="text-lg font-semibold ${status.includes('✅') ? 'text-green-600' : 'text-red-600'}">${status}</p>
+              ${data.tests.r2_bucket_access.message ? `<p class="text-foreground">${data.tests.r2_bucket_access.message}</p>` : ''}
+              ${data.tests.r2_bucket_access.bucket_name ? `<p class="text-muted-foreground text-sm">Bucket: ${data.tests.r2_bucket_access.bucket_name}</p>` : ''}
+              ${data.tests.r2_bucket_access.files_in_bucket !== undefined ? `<p class="text-muted-foreground text-sm">Files in bucket: ${data.tests.r2_bucket_access.files_in_bucket}</p>` : ''}
+              ${data.tests.r2_bucket_access.error ? `<p class="text-red-600 font-mono text-sm">${data.tests.r2_bucket_access.error}</p>` : ''}
+              ${data.tests.r2_bucket_access.response_time ? `<p class="text-muted-foreground text-sm">Response time: ${data.tests.r2_bucket_access.response_time}</p>` : ''}
+            </div>
+          </div>
+        `;
+      }
+
+      // R2 Write Test
+      if (data.tests.r2_bucket_write) {
+        const status = data.tests.r2_bucket_write.status;
+        html += `
+          <div class="bg-card border border-border rounded-lg p-6">
+            <h3 class="text-xl font-bold mb-4">✍️ R2 Write Test</h3>
+            <div class="space-y-2">
+              <p class="text-lg font-semibold ${status.includes('✅') ? 'text-green-600' : 'text-red-600'}">${status}</p>
+              ${data.tests.r2_bucket_write.message ? `<p class="text-foreground">${data.tests.r2_bucket_write.message}</p>` : ''}
+              ${data.tests.r2_bucket_write.test_file ? `<p class="text-muted-foreground text-sm font-mono">Test file: ${data.tests.r2_bucket_write.test_file}</p>` : ''}
+              ${data.tests.r2_bucket_write.error ? `<p class="text-red-600 font-mono text-sm">${data.tests.r2_bucket_write.error}</p>` : ''}
+            </div>
+          </div>
+        `;
+      }
+
+      // Upload Endpoint
+      if (data.tests.upload_endpoint) {
+        html += `
+          <div class="bg-card border border-border rounded-lg p-6">
+            <h3 class="text-xl font-bold mb-4">📤 Upload Endpoint</h3>
+            <div class="space-y-2">
+              <p class="text-lg font-semibold text-blue-600">${data.tests.upload_endpoint.status}</p>
+              <p class="text-foreground">${data.tests.upload_endpoint.message}</p>
+              ${data.tests.upload_endpoint.note ? `<p class="text-muted-foreground text-sm">${data.tests.upload_endpoint.note}</p>` : ''}
+            </div>
+          </div>
+        `;
+      }
+
+      // Raw JSON (collapsible)
+      html += `
+        <details class="bg-card border border-border rounded-lg p-6">
+          <summary class="cursor-pointer text-lg font-bold mb-4">📋 Raw JSON Output</summary>
+          <pre class="bg-muted p-4 rounded overflow-x-auto text-xs font-mono">${JSON.stringify(data, null, 2)}</pre>
+        </details>
+      `;
+
+      resultsEl.innerHTML = html;
+
+    } catch (error) {
+      loadingEl.classList.add('hidden');
+      resultsEl.classList.remove('hidden');
+      refreshBtn.classList.remove('hidden');
+
+      resultsEl.innerHTML = `
+        <div class="bg-red-50 dark:bg-red-900/20 border-2 border-red-500 rounded-lg p-6">
+          <h2 class="text-2xl font-bold text-red-600 mb-4">❌ Diagnostic Failed</h2>
+          <p class="text-foreground mb-4">Could not run diagnostics. Error:</p>
+          <pre class="bg-muted p-4 rounded overflow-x-auto text-sm font-mono text-red-600">${error}</pre>
+        </div>
+      `;
+    }
+  }
+
+  // Run on page load
+  runDiagnostics();
+
+  // Add refresh button handler
+  document.getElementById('refresh-btn')?.addEventListener('click', runDiagnostics);
+</script>
+
+<style>
+  .container {
+    max-width: 1280px;
+  }
+</style>
+</MainLayout>

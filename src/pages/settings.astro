@@ -1,0 +1,35 @@
+---
+import MainLayout from '../layouts/main.astro';
+import ProtectedRoute from '../components/ProtectedRoute';
+import NavBar from '../components/NavBar';
+---
+
+<MainLayout pageClass="settings-page">
+  <div class="min-h-screen bg-background" style="background-image: url('https://png.pngtree.com/background/20250117/original/pngtree-minimalistic-white-and-grey-abstract-texture-picture-image_15970824.jpg'); background-size: cover; background-position: center; background-attachment: fixed;">
+    <NavBar client:load />
+
+    <ProtectedRoute client:only="react">
+      <div class="container mx-auto px-4 py-12">
+        <div class="max-w-2xl mx-auto">
+          <h1 class="text-3xl font-bold font-heading mb-8">Account Settings</h1>
+          
+          <div class="bg-card border rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Profile Information</h2>
+            <p class="text-muted-foreground">Profile editing coming soon...</p>
+          </div>
+
+          <div class="bg-card border rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Account Security</h2>
+            <p class="text-muted-foreground">Password reset and 2FA coming soon...</p>
+          </div>
+        </div>
+      </div>
+    </ProtectedRoute>
+  </div>
+</MainLayout>
+
+<style>
+  .container {
+    max-width: 1280px;
+  }
+</style>

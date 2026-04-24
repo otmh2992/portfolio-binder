@@ -1,0 +1,8 @@
+The Worker URLs are downloading instead of streaming.
+
+This means either:
+1. The Worker code is wrong
+2. The Worker isn't using the R2 binding correctly
+3. The Content-Disposition header isn't being set
+
+We need to verify the Worker code in Cloudflare.

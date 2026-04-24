@@ -1,0 +1,24 @@
+---
+import MainLayout from '../layouts/main.astro';
+import NavBar from '../components/NavBar';
+import AuthForm from '../components/AuthForm';
+---
+
+<MainLayout pageClass="signup">
+  <div class="min-h-screen bg-background grey-texture">
+    <NavBar client:load />
+    
+    <div class="container mx-auto px-4 py-12">
+      <div class="max-w-md mx-auto">
+        <AuthForm client:only="react" mode="signup" />
+      </div>
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .container {
+    max-width: 1280px;
+  }
+</style>
+

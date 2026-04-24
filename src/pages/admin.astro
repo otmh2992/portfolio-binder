@@ -1,0 +1,37 @@
+---
+import MainLayout from '../layouts/main.astro';
+import PortfolioAdmin from '../components/PortfolioAdmin';
+---
+
+<MainLayout pageClass="admin">
+  <div class="min-h-screen bg-background" style="background-image: url('https://png.pngtree.com/background/20250117/original/pngtree-minimalistic-white-and-grey-abstract-texture-picture-image_15970824.jpg'); background-size: cover; background-position: center; background-attachment: fixed;">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div class="container mx-auto px-4">
+        <div class="flex h-16 items-center justify-between">
+          <div class="flex items-center gap-4">
+            <a href="/" class="text-2xl font-bold font-heading">PLAN Z</a>
+            <span class="text-sm text-muted-foreground">Admin Panel</span>
+          </div>
+          <a
+            href="/"
+            class="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            View Site
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-12">
+      <PortfolioAdmin client:load />
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .container {
+    max-width: 1280px;
+  }
+</style>

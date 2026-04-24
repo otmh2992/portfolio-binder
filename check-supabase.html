@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head><title>Supabase Test</title></head>
+<body>
+<h1>Testing Supabase Connection</h1>
+<div id="result"></div>
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+  
+  const supabase = createClient(
+    'https://ljlmsnqdtwhrrdbxgptz.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqbG1zbnFkdHdocnJkYnhncHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ4OTkyMjcsImV4cCI6MjA2MDQ3NTIyN30.BjWkjWBqWuhFnb1Fg9-tPWJSdg_3yCZXuPBf66gMqBc'
+  )
+  
+  async function test() {
+    const { data, error } = await supabase.from('portfolios').select('*')
+    document.getElementById('result').innerHTML = `
+      <h2>Result:</h2>
+      <pre>${JSON.stringify({ data, error }, null, 2)}</pre>
+    `
+  }
+  
+  test()
+</script>
+</body>
+</html>

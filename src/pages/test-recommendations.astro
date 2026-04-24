@@ -1,0 +1,93 @@
+---
+import MainLayout from '../layouts/main.astro';
+import NavBar from '../components/NavBar';
+
+// Test the recommendation system with different films
+const testFilms = [
+  'Blade Runner 2049',
+  'The Godfather',
+  'Inception',
+  'Parasite',
+  'Mad Max Fury Road'
+];
+---
+
+<MainLayout pageClass="test">
+  <div class="min-h-screen bg-background grey-texture">
+    <NavBar client:load />
+    
+    <div class="container mx-auto px-4 py-12">
+      <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold font-heading mb-8">
+          🎬 Test Recommendation System
+        </h1>
+        
+        <p class="text-muted-foreground mb-6">
+          Testing the 5-tier matching algorithm. Click a film to see recommendations:
+        </p>
+        
+        <div class="space-y-8">
+          {testFilms.map((filmTitle) => (
+            <div class="bg-card border border-border rounded-lg p-6">
+              <h2 class="text-2xl font-semibold mb-4">
+                If you watched: <span class="text-primary">{filmTitle}</span>
+              </h2>
+              <div class="space-y-2" data-film={filmTitle}>
+                <p class="text-muted-foreground">Loading recommendations...</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</MainLayout>
+
+<script>
+  import { baseUrl } from '../lib/base-url';
+  
+  // Fetch recommendations when page loads
+  document.addEventListener('DOMContentLoaded', async () => {
+    const containers = document.querySelectorAll('[data-film]');
+    
+    for (const container of containers) {
+      const filmTitle = container.getAttribute('data-film');
+      if (!filmTitle) continue;
+      
+      try {
+        const response = await fetch(`${baseUrl}/api/recommend-films?film=${encodeURIComponent(filmTitle)}`);
+        const data = await response.json();
+        
+        if (data.success && data.recommendations) {
+          const html = data.recommendations.map((film: any, index: number) => `
+            <div class="p-4 bg-background border border-border rounded-lg hover:border-primary/50 transition-colors">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-semibold text-lg">${film.title}</p>
+                  <p class="text-sm text-muted-foreground">
+                    ${film.year}
+                    ${film.matchReason ? `<span class="ml-2 text-primary">• ${film.matchReason}</span>` : ''}
+                  </p>
+                </div>
+                <div class="text-2xl">🎬</div>
+              </div>
+            </div>
+          `).join('');
+          
+          container.innerHTML = `<div class="space-y-3">${html}</div>`;
+        } else {
+          container.innerHTML = `<p class="text-red-500">Failed to load: ${data.error || 'Unknown error'}</p>`;
+        }
+      } catch (error) {
+        console.error('Error fetching recommendations:', error);
+        container.innerHTML = '<p class="text-red-500">Error loading recommendations</p>';
+      }
+    }
+  });
+</script>
+
+<style>
+  .container {
+    max-width: 1280px;
+  }
+</style>
