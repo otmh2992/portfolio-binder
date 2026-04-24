@@ -52,7 +52,6 @@ function injectDevScript(options = {}) {
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
-  // Remove base path - deploying to root domain
   devToolbar: {
     enabled: false,
   },
@@ -97,6 +96,8 @@ export default defineConfig({
     },
   },
 });
+
+
 
 
 
