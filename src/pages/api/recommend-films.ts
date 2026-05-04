@@ -11,7 +11,15 @@ export const GET: APIRoute = async ({ url }) => {
   if (!filmTitle) {
     return new Response(
       JSON.stringify({ error: 'Missing film parameter' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } }
+      {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+          Pragma: 'no-cache',
+          Expires: '0',
+        },
+      }
     );
   }
 
@@ -27,7 +35,12 @@ export const GET: APIRoute = async ({ url }) => {
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+          Pragma: 'no-cache',
+          Expires: '0',
+        },
       }
     );
   } catch (error) {
@@ -39,7 +52,12 @@ export const GET: APIRoute = async ({ url }) => {
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+          Pragma: 'no-cache',
+          Expires: '0',
+        },
       }
     );
   }

@@ -2,6 +2,12 @@
 // TypeScript Types for Database Schema
 // =====================================================
 
+// Chat message type for Ollama integration
+export interface ChatMessage {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+}
+
 export interface User {
   id: string;
   created_at: string;

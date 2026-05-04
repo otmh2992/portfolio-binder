@@ -54,6 +54,10 @@ function createSlug(title: string): string {
     .substring(0, 50);
 }
 
+function shuffleArray<T>(items: T[]): T[] {
+  return [...items].sort(() => Math.random() - 0.5);
+}
+
 /**
  * Get random page number for variety
  */
@@ -153,9 +157,9 @@ export async function getRecommendedFilms(inputFilmTitle: string): Promise<FilmF
     // TIER 1: Same Director + Same Genre (Highest Priority)
     if (director && recommendations.length < 5) {
       const directorFilms = await fetchFilmsByDirector(director, inputDetails.id);
-      const tier1 = directorFilms
-        .filter(film => film.genre_ids?.includes(primaryGenre))
-        .slice(0, 2);
+      const tier1 = shuffleArray(
+        directorFilms.filter(film => film.genre_ids?.includes(primaryGenre))
+      ).slice(0, 2);
       
       tier1.forEach(film => {
         if (!seenIds.has(film.id)) {
@@ -175,9 +179,9 @@ export async function getRecommendedFilms(inputFilmTitle: string): Promise<FilmF
         if (recommendations.length >= 5) break;
         
         const actorFilms = await fetchFilmsByActor(actor, inputDetails.id);
-        const tier2 = actorFilms
-          .filter(film => film.genre_ids?.some(id => genres.includes(id)))
-          .slice(0, 1);
+        const tier2 = shuffleArray(
+          actorFilms.filter(film => film.genre_ids?.some(id => genres.includes(id)))
+        ).slice(0, 1);
         
         tier2.forEach(film => {
           if (!seenIds.has(film.id) && recommendations.length < 5) {
@@ -195,7 +199,7 @@ export async function getRecommendedFilms(inputFilmTitle: string): Promise<FilmF
     // TIER 3: Same Genre + Era + Rating 7.0+
     if (recommendations.length < 5) {
       const genreFilms = await fetchFilmsByGenre(primaryGenre, inputYear);
-      const tier3 = genreFilms
+      const tier3 = shuffleArray(genreFilms)
         .filter(film => 
           !seenIds.has(film.id) &&
           film.vote_average >= 7.0 &&
@@ -216,7 +220,7 @@ export async function getRecommendedFilms(inputFilmTitle: string): Promise<FilmF
     // TIER 4: TMDB Similar Films Algorithm
     if (recommendations.length < 5) {
       const similarFilms = await fetchSimilarFilms(inputDetails.id);
-      const tier4 = similarFilms
+      const tier4 = shuffleArray(similarFilms)
         .filter(film => !seenIds.has(film.id))
         .slice(0, 5 - recommendations.length);
       
@@ -233,7 +237,7 @@ export async function getRecommendedFilms(inputFilmTitle: string): Promise<FilmF
     // TIER 5: Shared Keywords/Themes
     if (recommendations.length < 5 && keywords.length > 0) {
       const keywordFilms = await fetchFilmsByKeywords(keywords, inputDetails.id);
-      const tier5 = keywordFilms
+      const tier5 = shuffleArray(keywordFilms)
         .filter(film => !seenIds.has(film.id))
         .slice(0, 5 - recommendations.length);
       

@@ -128,6 +128,9 @@ export default function NavBar() {
                   <DropdownMenuItem onClick={() => window.location.href = `${baseUrl}/filmmaker/${userData.username}`}>
                     View Profile
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => window.location.href = `${baseUrl}/profile`}>
+                    Profile Workspace
+                  </DropdownMenuItem>
                   {/* Temporarily removed until pages are created:
                   <DropdownMenuItem onClick={() => window.location.href = `${baseUrl}/settings`}>
                     Settings

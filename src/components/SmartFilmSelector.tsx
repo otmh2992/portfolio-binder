@@ -29,6 +29,53 @@ export default function SmartFilmSelector({ onSelect }: SmartFilmSelectorProps) 
   const searchTimeoutRef = useRef<NodeJS.Timeout>();
   const refreshIntervalRef = useRef<NodeJS.Timeout>();
   const countdownIntervalRef = useRef<NodeJS.Timeout>();
+  const previousTopTwoRef = useRef<string[]>([]);
+
+  const shuffleFilms = (items: Film[]): Film[] => {
+    return [...items].sort(() => Math.random() - 0.5);
+  };
+
+  const normalizeRecommendations = (items: Film[]): Film[] => {
+    if (items.length <= 1) return items;
+
+    const previousTopTwo = previousTopTwoRef.current;
+    let next = shuffleFilms(items);
+
+    // Try a few shuffles to avoid repeating the top slots.
+    for (let i = 0; i < 8; i++) {
+      const topTwo = next.slice(0, 2).map((film) => film.slug);
+      const repeatedTopOne = previousTopTwo[0] && topTwo[0] === previousTopTwo[0];
+      const repeatedTopTwo = previousTopTwo[1] && topTwo[1] === previousTopTwo[1];
+
+      if (!repeatedTopOne && !repeatedTopTwo) break;
+      next = shuffleFilms(next);
+    }
+
+    // Hard guarantee: if top film still repeats and alternatives exist, swap it out.
+    if (previousTopTwo[0] && next[0]?.slug === previousTopTwo[0]) {
+      const replacementIndex = next.findIndex((film) => film.slug !== previousTopTwo[0]);
+      if (replacementIndex > 0) {
+        const replacement = next[replacementIndex];
+        next[replacementIndex] = next[0];
+        next[0] = replacement;
+      }
+    }
+
+    // Keep second slot from repeating when possible too.
+    if (previousTopTwo[1] && next[1]?.slug === previousTopTwo[1]) {
+      const replacementIndex = next.findIndex(
+        (film, index) => index > 1 && film.slug !== previousTopTwo[1]
+      );
+      if (replacementIndex > 1) {
+        const replacement = next[replacementIndex];
+        next[replacementIndex] = next[1];
+        next[1] = replacement;
+      }
+    }
+
+    previousTopTwoRef.current = next.slice(0, 2).map((film) => film.slug);
+    return next;
+  };
 
   // Search debounce
   useEffect(() => {
@@ -113,11 +160,15 @@ export default function SmartFilmSelector({ onSelect }: SmartFilmSelectorProps) 
     setIsLoadingRecommendations(true);
 
     try {
-      const response = await fetch(`${baseUrl}/api/recommend-films?film=${encodeURIComponent(film.title)}`);
+      const cacheBuster = Date.now();
+      const response = await fetch(
+        `${baseUrl}/api/recommend-films?film=${encodeURIComponent(film.title)}&t=${cacheBuster}`,
+        { cache: 'no-store' }
+      );
       const data = await response.json();
       
       if (data.success && data.recommendations) {
-        setRecommendations(data.recommendations);
+        setRecommendations(normalizeRecommendations(data.recommendations));
       } else {
         throw new Error('Failed to get recommendations');
       }
@@ -175,6 +226,7 @@ export default function SmartFilmSelector({ onSelect }: SmartFilmSelectorProps) 
     setFinalUsername(null);
     setRollingNumber('0000');
     setIsRolling(false);
+    previousTopTwoRef.current = [];
   };
 
   // STEP 1: Search for last watched film

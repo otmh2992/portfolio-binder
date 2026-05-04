@@ -1,0 +1,24 @@
+---
+import MainLayout from '../layouts/main.astro';
+import NavBar from '../components/NavBar';
+import ProtectedRoute from '../components/ProtectedRoute';
+import MyProfileWorkspace from '../components/MyProfileWorkspace';
+---
+
+<MainLayout pageClass="profile-workspace">
+  <div class="min-h-screen bg-background grey-texture">
+    <NavBar client:load />
+
+    <ProtectedRoute client:only="react">
+      <div class="container mx-auto px-4 py-12">
+        <MyProfileWorkspace client:only="react" />
+      </div>
+    </ProtectedRoute>
+  </div>
+</MainLayout>
+
+<style>
+  .container {
+    max-width: 1280px;
+  }
+</style>
