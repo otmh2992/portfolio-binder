@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+useEffect(() => {
+  const run = async () => {
+    console.log("🔥 CALLBACK STARTED");
 
-export default function AuthCallback() {
-  const [status, setStatus] = useState("PAGE LOADED");
+    console.log("SUPABASE_URL:", import.meta.env.PUBLIC_SUPABASE_URL);
+    console.log("SUPABASE_KEY_EXISTS:", !!import.meta.env.PUBLIC_SUPABASE_ANON_KEY);
 
-  useEffect(() => {
-    console.log("CALLBACK RAN");
-    setStatus("CLIENT JS WORKS");
-  }, []);
+    setStatus("Check console logs (Step 2 running)");
 
-  return <div>{status}</div>;
-}
+    // STOP HERE intentionally (no DB calls yet)
+  };
+
+  run();
+}, []);
