@@ -4,21 +4,32 @@ import AuthForm from '../components/AuthForm';
 ---
 
 <MainLayout pageClass="auth-page">
-  <div class="min-h-screen bg-background flex items-center justify-center p-4" style="background-image: url('https://png.pngtree.com/background/20250117/original/pngtree-minimalistic-white-and-grey-abstract-texture-picture-image_15970824.jpg'); background-size: cover; background-position: center; background-attachment: fixed;">
+  <div
+    class="min-h-screen bg-background flex items-center justify-center p-4"
+    style="background-image: url('https://png.pngtree.com/background/20250117/original/pngtree-minimalistic-white-and-grey-abstract-texture-picture-image_15970824.jpg'); background-size: cover; background-position: center; background-attachment: fixed;"
+  >
     <div class="w-full max-w-md">
       <div class="text-center mb-8">
         <a href="/" class="inline-block">
           <h1 class="text-3xl font-bold font-heading mb-2">PLAN Z</h1>
         </a>
-        <p class="text-muted-foreground">Filmmaker Crowdfunding Platform</p>
+
+        <p class="text-muted-foreground">
+          Filmmaker Crowdfunding Platform
+        </p>
       </div>
 
       <AuthForm client:load defaultTab="login" />
 
       <div class="mt-6 text-center text-sm text-muted-foreground">
         <p>
-          Don't have an account? 
-          <a href="/signup" class="text-primary hover:underline font-medium">Sign up</a>
+          Don't have an account?
+          <a
+            href="/register"
+            class="text-primary hover:underline font-medium"
+          >
+            Sign up
+          </a>
         </p>
       </div>
     </div>

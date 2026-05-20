@@ -1,53 +1,8 @@
-
-
-
-
-
-
 ---
-import MainLayout from '../layouts/main.astro';
-import PortfolioGridSupabase from '../components/PortfolioGridSupabase';
-import NavBar from '../components/NavBar';
 ---
 
-<MainLayout pageClass="portfolio">
-<div class="min-h-screen bg-background grey-texture">
-  <!-- Sticky Navigation Banner -->
-  <NavBar client:load />
-
-  <!-- Main Content -->
-  <div class="container mx-auto px-4 py-12">
-    <main>
-      {/* Single Portfolio Grid - All Work */}
-      <div>
-        <h2 class="text-3xl font-bold font-heading mb-8">Featured Work</h2>
-        <PortfolioGridSupabase client:load />
-      </div>
-    </main>
-  </div>
-</div>
-</MainLayout>
-
-<style>
-  .container {
-    max-width: 1280px;
-  }
-</style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<html>
+  <body>
+    <h1>ROOT OK</h1>
+  </body>
+</html>

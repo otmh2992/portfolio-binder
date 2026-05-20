@@ -18,89 +18,82 @@ export default function NavBar() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkUser();
+    let mounted = true;
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
-        setUser(session.user);
-        loadUserData(session.user.id);
-      } else {
-        setUser(null);
-        setUserData(null);
+    const init = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!mounted) return;
+
+      setUser(user);
+
+      if (user) {
+        const { data } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (!mounted) return;
+
+        setUserData(data);
       }
-    });
+
+      setLoading(false);
+    };
+
+    init();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        const u = session?.user ?? null;
+
+        setUser(u);
+
+        if (u) {
+          const { data } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', u.id)
+            .maybeSingle();
+
+          setUserData(data);
+        } else {
+          setUserData(null);
+        }
+      }
+    );
 
     return () => {
+      mounted = false;
       authListener.subscription.unsubscribe();
     };
   }, []);
-
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setUser(user);
-    if (user) {
-      await loadUserData(user.id);
-    }
-    setLoading(false);
-  };
-
-  const loadUserData = async (userId: string) => {
-    const { data } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    
-    console.log('Loaded user data:', data); // Debug log
-    setUserData(data);
-  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     window.location.href = baseUrl || '/';
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          {/* Left Navigation */}
+
           <nav className="flex items-center gap-6">
-            <a href={baseUrl || '/'} className="text-sm font-medium transition-colors hover:text-primary">
-              Home
-            </a>
-            {/* Temporarily removed until pages are created:
-            <a href={`${baseUrl}/explore`} className="text-sm font-medium transition-colors hover:text-primary">
-              Explore
-            </a>
-            <a href={`${baseUrl}/about`} className="text-sm font-medium transition-colors hover:text-primary">
-              About
-            </a>
-            */}
+            <a href={baseUrl || '/'}>Home</a>
           </nav>
 
-          {/* Center Logo */}
           <div className="flex-1 flex justify-center">
             <a href={baseUrl || '/'}>
-              <h1 className="text-2xl font-bold font-heading">PLAN Z</h1>
+              <h1 className="text-2xl font-bold">PLAN Z</h1>
             </a>
           </div>
 
-          {/* Right Side - Auth */}
           <div className="flex items-center gap-4">
-            {/* Submit Work Button - Always visible */}
-            <Button 
-              variant="default" 
-              size="sm" 
+
+            <Button
+              size="sm"
               onClick={() => window.location.href = `${baseUrl}/submit`}
             >
               Submit Work
@@ -111,65 +104,55 @@ export default function NavBar() {
             ) : user && userData ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                    <span className="text-sm font-medium">
-                      {userData.full_name || userData.username}
-                    </span>
+                  <button>
+                    {userData.username || userData.full_name}
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
+
+                <DropdownMenuContent align="end">
+
                   <DropdownMenuLabel>
-                    <div className="flex flex-col">
-                      <span className="font-medium">{userData.full_name || userData.username}</span>
-                      <span className="text-xs text-muted-foreground">{user.email}</span>
-                    </div>
+                    {user.email}
                   </DropdownMenuLabel>
+
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => window.location.href = `${baseUrl}/filmmaker/${userData.username}`}>
-                    View Profile
+
+                  <DropdownMenuItem
+                    onClick={() =>
+                      window.location.href = `${baseUrl}/filmmaker/${userData.username}`
+                    }
+                  >
+                    Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => window.location.href = `${baseUrl}/profile`}>
-                    Profile Workspace
-                  </DropdownMenuItem>
-                  {/* Temporarily removed until pages are created:
-                  <DropdownMenuItem onClick={() => window.location.href = `${baseUrl}/settings`}>
-                    Settings
-                  </DropdownMenuItem>
-                  {userData.role === 'filmmaker' && (
-                    <DropdownMenuItem onClick={() => window.location.href = `${baseUrl}/upload`}>
-                      Upload Work
-                    </DropdownMenuItem>
-                  )}
-                  */}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+
+                  <DropdownMenuItem onClick={handleLogout}>
                     Log Out
                   </DropdownMenuItem>
+
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" onClick={() => window.location.href = `${baseUrl}/login`}>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => window.location.href = `${baseUrl}/login`}
+                >
                   Log In
                 </Button>
-                <Button size="sm" onClick={() => window.location.href = `${baseUrl}/signup`}>
+
+                <Button
+                  size="sm"
+                  onClick={() => window.location.href = `${baseUrl}/signup`}
+                >
                   Sign Up
                 </Button>
               </div>
             )}
           </div>
+
         </div>
       </div>
     </header>
   );
 }
-
-
-
-
-
-
-
-
-
-

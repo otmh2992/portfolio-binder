@@ -1,19 +1,19 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 
 interface ProtectedRouteProps {
-  children: ReactNode;
+  children: React.ReactNode;
   requiredRole?: 'filmmaker' | 'backer' | 'admin';
   redirectTo?: string;
 }
 
-export default function ProtectedRoute({ 
-  children, 
+export default function ProtectedRoute({
+  children,
   requiredRole,
-  redirectTo = '/login' 
+  redirectTo = '/login',
 }: ProtectedRouteProps) {
   const [authUser, setAuthUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -38,8 +38,10 @@ export default function ProtectedRoute({
 
   const checkAuth = async () => {
     try {
-      // Check if user is authenticated
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
 
       if (authError || !user) {
         window.location.href = redirectTo;
@@ -48,7 +50,6 @@ export default function ProtectedRoute({
 
       setAuthUser(user);
 
-      // If role is required, check it
       if (requiredRole) {
         const { data: userData, error: userError } = await supabase
           .from('users')
@@ -81,10 +82,7 @@ export default function ProtectedRoute({
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Checking authentication...</p>
-        </div>
+        <p>Checking authentication...</p>
       </div>
     );
   }
@@ -96,23 +94,21 @@ export default function ProtectedRoute({
           <CardHeader>
             <CardTitle>Access Denied</CardTitle>
             <CardDescription>
-              {requiredRole 
+              {requiredRole
                 ? `This page requires ${requiredRole} access. Your current role: ${userRole}`
                 : 'You need to be logged in to access this page.'}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <Button 
-              className="w-full" 
-              onClick={() => window.location.href = '/'}
-            >
+
+          <CardContent>
+            <Button className="w-full" onClick={() => (window.location.href = '/')}>
               Go to Home
             </Button>
+
             {requiredRole && userRole && (
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => window.location.href = '/upgrade'}
+              <Button
+                className="w-full mt-2"
+                onClick={() => (window.location.href = '/upgrade')}
               >
                 Upgrade to {requiredRole}
               </Button>
