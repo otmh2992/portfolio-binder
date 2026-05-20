@@ -1,24 +1,11 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
 
 export default function AuthCallback() {
-  const [status, setStatus] = useState("STARTING");
+  const [status, setStatus] = useState("PAGE LOADED");
 
   useEffect(() => {
-    const run = async () => {
-      console.log("CALLBACK STARTED");
-
-      const { data, error } = await supabase
-        .from("email_verifications")
-        .select("*")
-        .limit(1);
-
-      console.log("SUPABASE RESPONSE:", { data, error });
-
-      setStatus(error ? "ERROR" : "SUCCESS");
-    };
-
-    run();
+    console.log("CALLBACK RAN");
+    setStatus("CLIENT JS WORKS");
   }, []);
 
   return <div>{status}</div>;
