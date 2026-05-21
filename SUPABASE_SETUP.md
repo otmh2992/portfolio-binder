@@ -34,8 +34,9 @@ In your Webflow project, add these environment variables:
 3. Add these **Environment Variables**:
 
 ```
-PUBLIC_SUPABASE_URL = (paste your Project URL here)
-PUBLIC_SUPABASE_ANON_KEY = (paste your anon public key here)
+PUBLIC_SUPABASE_URL = https://ljlmsnqdtwhrrdbxgptz.supabase.co
+PUBLIC_SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqbG1zbnFkdHdocnJkYnhncHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MDY5NzgsImV4cCI6MjA5MjE4Mjk3OH0.kh3WIgs81NP7nXXYsK0T-uBmOlDQjNAl26o68FfY1sw
+
 ```
 
 ---

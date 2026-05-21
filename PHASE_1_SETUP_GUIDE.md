@@ -56,8 +56,9 @@ A complete database for your filmmaker crowdfunding platform with:
 
 **Option A: Local Development (.env file)**
 ```env
-PUBLIC_SUPABASE_URL=your_project_url_here
-PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
+PUBLIC_SUPABASE_URL=https://ljlmsnqdtwhrrdbxgptz.supabase.co
+PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqbG1zbnFkdHdocnJkYnhncHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MDY5NzgsImV4cCI6MjA5MjE4Mjk3OH0.kh3WIgs81NP7nXXYsK0T-uBmOlDQjNAl26o68FfY1sw
+
 ```
 
 **Option B: Webflow Deployment**
@@ -65,8 +66,9 @@ PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
 2. Find your app → **Settings**
 3. Add **Environment Variables**:
    ```
-   PUBLIC_SUPABASE_URL = (paste your URL)
-   PUBLIC_SUPABASE_ANON_KEY = (paste your key)
+   PUBLIC_SUPABASE_URL = https://ljlmsnqdtwhrrdbxgptz.supabase.co
+   PUBLIC_SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqbG1zbnFkdHdocnJkYnhncHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MDY5NzgsImV4cCI6MjA5MjE4Mjk3OH0.kh3WIgs81NP7nXXYsK0T-uBmOlDQjNAl26o68FfY1sw
+
    ```
 
 ---

@@ -28,8 +28,8 @@
 ### 4. Add Keys to Webflow
 In your Webflow Apps dashboard:
 ```
-PUBLIC_SUPABASE_URL = (your project URL)
-PUBLIC_SUPABASE_ANON_KEY = (your anon key)
+PUBLIC_SUPABASE_URL = https://ljlmsnqdtwhrrdbxgptz.supabase.co
+PUBLIC_SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqbG1zbnFkdHdocnJkYnhncHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MDY5NzgsImV4cCI6MjA5MjE4Mjk3OH0.kh3WIgs81NP7nXXYsK0T-uBmOlDQjNAl26o68FfY1sw
 ```
 
 ### 5. Create Database Table

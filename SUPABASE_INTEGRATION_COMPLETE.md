@@ -36,8 +36,9 @@ Your portfolio is now **fully integrated with Supabase** instead of Webflow CMS!
 3. **Get API keys** → Settings → API → Copy URL & anon key
 4. **Add to Webflow** → Apps → Your App → Settings → Environment Variables
    ```
-   PUBLIC_SUPABASE_URL = (paste your URL)
-   PUBLIC_SUPABASE_ANON_KEY = (paste your key)
+   PUBLIC_SUPABASE_URL = https://ljlmsnqdtwhrrdbxgptz.supabase.co
+   PUBLIC_SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqbG1zbnFkdHdocnJkYnhncHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MDY5NzgsImV4cCI6MjA5MjE4Mjk3OH0.kh3WIgs81NP7nXXYsK0T-uBmOlDQjNAl26o68FfY1sw
+
    ```
 5. **Create database table**:
    - Go to Supabase → SQL Editor
