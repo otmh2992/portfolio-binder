@@ -21,17 +21,18 @@ export default function NavBar() {
     let mounted = true;
 
     const init = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const u = session?.user ?? null;
 
       if (!mounted) return;
 
-      setUser(user);
+      setUser(u);
 
-      if (user) {
+      if (u) {
         const { data } = await supabase
           .from('users')
           .select('*')
-          .eq('id', user.id)
+          .eq('id', u.id)
           .maybeSingle();
 
         if (!mounted) return;

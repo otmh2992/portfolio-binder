@@ -39,15 +39,16 @@ export default function ProtectedRoute({
   const checkAuth = async () => {
     try {
       const {
-        data: { user },
+        data: { session },
         error: authError,
-      } = await supabase.auth.getUser();
+      } = await supabase.auth.getSession();
 
-      if (authError || !user) {
+      if (authError || !session) {
         window.location.href = redirectTo;
         return;
       }
 
+      const user = session.user;
       setAuthUser(user);
 
       if (requiredRole) {

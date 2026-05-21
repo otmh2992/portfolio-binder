@@ -3,9 +3,11 @@ import { createClient } from '@supabase/supabase-js';
 
 export const POST: APIRoute = async ({ request, locals, cookies }) => {
   try {
-    // Get Supabase config
-    const supabaseUrl = locals?.runtime?.env?.SUPABASE_URL || import.meta.env.SUPABASE_URL;
-    const supabaseAnonKey = locals?.runtime?.env?.SUPABASE_ANON_KEY || import.meta.env.SUPABASE_ANON_KEY;
+    const supabaseUrl =
+      locals?.runtime?.env?.SUPABASE_URL || import.meta.env.SUPABASE_URL;
+
+    const supabaseAnonKey =
+      locals?.runtime?.env?.SUPABASE_ANON_KEY || import.meta.env.SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseAnonKey) {
       return new Response(JSON.stringify({ message: 'Missing Supabase configuration' }), {
@@ -14,9 +16,8 @@ export const POST: APIRoute = async ({ request, locals, cookies }) => {
       });
     }
 
-    // Get auth token from cookies
     const authToken = cookies.get('sb-access-token')?.value;
-    
+
     if (!authToken) {
       return new Response(JSON.stringify({ message: 'Unauthorized. Please log in.' }), {
         status: 401,
@@ -24,7 +25,6 @@ export const POST: APIRoute = async ({ request, locals, cookies }) => {
       });
     }
 
-    // Create Supabase client
     const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       global: {
         headers: {
@@ -33,18 +33,22 @@ export const POST: APIRoute = async ({ request, locals, cookies }) => {
       },
     });
 
-    // Verify user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { session },
+      error: authError,
+    } = await supabase.auth.getSession();
 
-    if (authError || !user) {
+    if (authError || !session) {
       return new Response(JSON.stringify({ message: 'Invalid authentication' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
-    // Get request body
-    const { title, description, category, video_url, thumbnail_url, slug } = await request.json();
+    const user = session.user;
+
+    const { title, description, category, video_url, thumbnail_url, slug } =
+      await request.json();
 
     if (!title || !category || !slug) {
       return new Response(JSON.stringify({ message: 'Missing required fields' }), {
@@ -53,7 +57,6 @@ export const POST: APIRoute = async ({ request, locals, cookies }) => {
       });
     }
 
-    // Insert portfolio item
     const { data, error } = await supabase
       .from('portfolios')
       .insert({
@@ -71,13 +74,11 @@ export const POST: APIRoute = async ({ request, locals, cookies }) => {
 
     if (error) {
       console.error('Supabase insert error:', error);
-      return new Response(
-        JSON.stringify({ message: `Database error: ${error.message}` }),
-        {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
+
+      return new Response(JSON.stringify({ message: error.message }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     return new Response(JSON.stringify({ success: true, data }), {
@@ -86,6 +87,7 @@ export const POST: APIRoute = async ({ request, locals, cookies }) => {
     });
   } catch (error) {
     console.error('Submit portfolio error:', error);
+
     return new Response(
       JSON.stringify({
         message: error instanceof Error ? error.message : 'Failed to save portfolio',
