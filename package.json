@@ -46,6 +46,7 @@
     "react-dom": "19.1.1",
     "resend": "6.12.3",
     "tailwindcss": "4.1.11",
+    "webflow-api": "3.3.4",
     "zod": "4.0.13"
   },
   "devDependencies": {
