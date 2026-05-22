@@ -1,8 +1,24 @@
 ---
+import NavBar from '../components/NavBar';
+import PortfolioGridSupabase from '../components/PortfolioGridSupabase';
+import '../styles/global.css';
 ---
 
-<html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Planzzz</title>
+  </head>
+
   <body>
-    <h1>PURE STATIC TEST</h1>
+    <NavBar client:load />
+
+    <main>
+      <h1 style="text-align:center; margin-top:40px;">
+        Featured Work
+      </h1>
+
+      <PortfolioGridSupabase client:load />
+    </main>
   </body>
 </html>
