@@ -1,26 +1,29 @@
 ---
-import MainLayout from '../../layouts/main.astro';
-import UserProfile from '../../components/UserProfile';
-import NavBar from '../../components/NavBar';
+import MainLayout from "../../layouts/main.astro";
+import UserProfile from "../../components/UserProfile";
+import NavBar from "../../components/NavBar";
 
 const { username } = Astro.params;
 ---
 
 <MainLayout pageClass="profile-page">
   <div class="min-h-screen bg-background grey-texture">
-    <!-- Navigation Banner -->
+    
+    <!-- Navigation -->
     <NavBar client:load />
 
     <!-- Profile Content -->
-    <div class="container mx-auto px-4 py-12">
-      <UserProfile username={username!} client:load />
+    <div class="profile-container">
+      <UserProfile client:load username={username ?? ""} />
     </div>
+
   </div>
 </MainLayout>
 
 <style>
-  .container {
+  .profile-container {
     max-width: 1280px;
+    margin: 0 auto;
+    padding: 3rem 1rem;
   }
 </style>
-
