@@ -1,15 +1,33 @@
 ---
 const { pageClass = '' } = Astro.props;
+const siteUrl = import.meta.env.PUBLIC_SITE_URL ?? 'https://planzzz.com';
 ---
 
-<html lang="en">
+<!doctype html>
+<html lang="en" class={pageClass}>
   <head>
     <meta charset="utf-8" />
-    <title>TEST MODE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Planzzz</title>
+
+    <!-- CRITICAL: forces all relative links to correct domain -->
+    <base href={siteUrl + "/"} />
+
+    <!-- prevents weird cached auth redirects -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <!-- avoids www vs apex mismatch issues -->
+    <script is:inline>
+      if (location.hostname === "www.planzzz.com") {
+        location.replace(location.href.replace("www.", ""));
+      }
+    </script>
   </head>
 
   <body>
-    <h1>LAYOUT IS WORKING</h1>
     <slot />
   </body>
 </html>
