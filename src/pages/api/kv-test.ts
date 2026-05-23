@@ -1,24 +1,25 @@
-import type { APIRoute } from "astro";
-
-export const GET: APIRoute = async ({ locals }) => {
+export const GET = async ({ locals }) => {
   try {
-    const kv = locals.runtime.env.SESSION;
-
-    await kv.put("test-key", "hello");
-    const value = await kv.get("test-key");
+    const result = await locals.runtime.env.SESSION?.get("test");
 
     return new Response(
       JSON.stringify({
-        success: true,
-        value,
+        ok: true,
+        kvValue: result ?? null,
+        message: "KV working"
       }),
-      { status: 200 }
+      {
+        status: 200,
+        headers: {
+          "content-type": "application/json"
+        }
+      }
     );
-  } catch (err: any) {
+  } catch (err) {
     return new Response(
       JSON.stringify({
-        success: false,
-        error: err.message,
+        ok: false,
+        error: String(err)
       }),
       { status: 500 }
     );
