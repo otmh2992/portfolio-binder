@@ -1,45 +1,26 @@
-export const prerender = false;
+import type { APIRoute } from "astro";
 
-export async function GET({ locals }) {
+export const GET: APIRoute = async ({ locals }) => {
   try {
-    // Cloudflare KV binding (Astro Cloudflare adapter)
-    const env = locals.runtime?.env;
+    const kv = locals.runtime.env.SESSION;
 
-    if (!env?.SESSION) {
-      return new Response(
-        JSON.stringify({
-          ok: false,
-          error: "KV binding SESSION not found",
-        }),
-        { status: 500 }
-      );
-    }
-
-    // write test value
-    await env.SESSION.put("kv_test", "it works!");
-
-    // read it back
-    const value = await env.SESSION.get("kv_test");
+    await kv.put("test-key", "hello");
+    const value = await kv.get("test-key");
 
     return new Response(
       JSON.stringify({
-        ok: true,
+        success: true,
         value,
-        message: "KV is working correctly",
       }),
-      {
-        headers: {
-          "content-type": "application/json",
-        },
-      }
+      { status: 200 }
     );
-  } catch (err) {
+  } catch (err: any) {
     return new Response(
       JSON.stringify({
-        ok: false,
-        error: String(err),
+        success: false,
+        error: err.message,
       }),
       { status: 500 }
     );
   }
-}
+};
