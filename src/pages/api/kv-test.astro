@@ -1,0 +1,29 @@
+---
+export async function GET({ platform }) {
+  const kv = platform?.env?.SESSION;
+
+  // 1. check binding exists
+  if (!kv) {
+    return new Response("SESSION KV not found", { status: 500 });
+  }
+
+  // 2. write test value
+  await kv.put("debug-key", "kv-is-working");
+
+  // 3. read it back
+  const value = await kv.get("debug-key");
+
+  // 4. return result
+  return new Response(
+    JSON.stringify({
+      ok: true,
+      storedValue: value
+    }),
+    {
+      headers: {
+        "content-type": "application/json"
+      }
+    }
+  );
+}
+---
