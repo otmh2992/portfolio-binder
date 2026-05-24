@@ -1,4 +1,5 @@
 import { defineConfig } from "astro/config";
+import react from "@astrojs/react";
 import cloudflare from "@astrojs/cloudflare";
 
 export default defineConfig({
@@ -8,8 +9,8 @@ export default defineConfig({
     platformProxy: {
       enabled: true,
     },
-
-    // 🔥 THIS IS THE KEY FIX FOR YOUR ERRORS
-    nodeCompat: true,
+    imageService: "compile",
   }),
+
+  integrations: [react()],
 });
