@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+
 
 const getTransloaditCredentials = () => {
   const authKey = import.meta.env.TRANSLOADIT_KEY;
@@ -14,13 +14,25 @@ const getTransloaditCredentials = () => {
 };
 
 // Generate signature for Transloadit API
+import { hmac } from "@noble/hashes/hmac";
+import { sha1 } from "@noble/hashes/sha1";
+import { utf8ToBytes } from "@noble/hashes/utils";
+
+function toHex(bytes: Uint8Array) {
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 function generateSignature(params: any, secret: string): string {
   const jsonParams = JSON.stringify(params);
-  const signature = crypto
-    .createHmac('sha1', secret)
-    .update(jsonParams, 'utf-8')
-    .digest('hex');
-  return signature;
+
+  const keyBytes = utf8ToBytes(secret);
+  const msgBytes = utf8ToBytes(jsonParams);
+
+  const sigBytes = hmac(sha1, keyBytes, msgBytes);
+
+  return toHex(sigBytes);
 }
 
 export async function createAssemblyWithFile(file: File) {

@@ -1,11 +1,15 @@
-import { defineConfig } from 'astro/config';
-import cloudflare from '@astrojs/cloudflare';
+import { defineConfig } from "astro/config";
+import cloudflare from "@astrojs/cloudflare";
 
 export default defineConfig({
-  output: 'server',
+  output: "server",
+
   adapter: cloudflare({
     platformProxy: {
-      enabled: true
-    }
+      enabled: true,
+    },
+
+    // 🔥 THIS IS THE KEY FIX FOR YOUR ERRORS
+    nodeCompat: true,
   }),
 });
