@@ -1,6 +1,5 @@
 import { Resend } from "resend";
 import { createClient } from "@supabase/supabase-js";
-import crypto from "crypto";
 
 const resend = new Resend(import.meta.env.RESEND_API_KEY);
 
@@ -9,14 +8,18 @@ const supabaseAdmin = createClient(
   import.meta.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+function generateToken() {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Array.from(array, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 export async function POST({ request }) {
   try {
     const { email } = await request.json();
 
-    // 1. generate token
-    const token = crypto.randomBytes(32).toString("hex");
+    const token = generateToken();
 
-    // 2. store token
     const { error } = await supabaseAdmin
       .from("email_verifications")
       .insert({
@@ -26,13 +29,11 @@ export async function POST({ request }) {
 
     if (error) throw error;
 
-    // 3. build verification link
     const verifyUrl =
       `${import.meta.env.PUBLIC_SITE_URL}/auth/callback?email=` +
       encodeURIComponent(email) +
       `&token=${token}`;
 
-    // 4. send email via Resend
     await resend.emails.send({
       from: "PLAN Z <hal@planzzz.com>",
       to: email,
@@ -47,11 +48,9 @@ export async function POST({ request }) {
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
     });
-
   } catch (err: any) {
-    return new Response(
-      JSON.stringify({ error: err.message }),
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+    });
   }
 }
