@@ -1,5 +1,0 @@
-name = "portfolio-builder"
-compatibility_date = "2026-05-22"
-
-# 🔥 THIS fixes MessageChannel + React SSR crashes
-compatibility_flags = ["nodejs_compat"]
