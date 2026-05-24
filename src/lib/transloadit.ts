@@ -3,9 +3,11 @@ import { sha1 } from "@noble/hashes/sha1";
 import { utf8ToBytes } from "@noble/hashes/utils";
 
 function toHex(bytes: Uint8Array) {
-  return Array.from(bytes)
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+  let hex = "";
+  for (let i = 0; i < bytes.length; i++) {
+    hex += bytes[i].toString(16).padStart(2, "0");
+  }
+  return hex;
 }
 
 export function generateSignature(params: any, secret: string): string {
