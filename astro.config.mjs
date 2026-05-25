@@ -3,7 +3,7 @@ import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 
 export default defineConfig({
-  output: "server",
+  output: "hybrid",
 
   adapter: cloudflare({
     imageService: "compile",
