@@ -1,16 +1,32 @@
 import { defineConfig } from "astro/config";
-import react from "@astrojs/react";
 import cloudflare from "@astrojs/cloudflare";
+import react from "@astrojs/react";
 
 export default defineConfig({
   output: "server",
 
   adapter: cloudflare({
     platformProxy: {
-      enabled: true,
-    },
-    imageService: "compile",
+      enabled: true
+    }
   }),
 
   integrations: [react()],
+
+  vite: {
+    ssr: {
+      external: [
+        "webflow-api",
+        "@aws-sdk/*"
+      ]
+    },
+
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: undefined
+        }
+      }
+    }
+  }
 });
