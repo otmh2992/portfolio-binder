@@ -1,22 +1,72 @@
 import { hmac } from "@noble/hashes/hmac";
 import { sha1 } from "@noble/hashes/sha1";
-import { utf8ToBytes } from "@noble/hashes/utils";
+import { utf8ToBytes, bytesToHex } from "@noble/hashes/utils";
 
-function toHex(bytes: Uint8Array) {
-  let hex = "";
-  for (let i = 0; i < bytes.length; i++) {
-    hex += bytes[i].toString(16).padStart(2, "0");
+/**
+ * Stable JSON stringify to guarantee identical signatures
+ * across environments and key ordering.
+ */
+function stableStringify(value: unknown): string {
+  if (value === null || typeof value !== "object") {
+    return JSON.stringify(value);
   }
-  return hex;
+
+  if (Array.isArray(value)) {
+    return `[${value.map(stableStringify).join(",")}]`;
+  }
+
+  const obj = value as Record<string, unknown>;
+
+  return `{${Object.keys(obj)
+    .sort()
+    .map((key) => `${JSON.stringify(key)}:${stableStringify(obj[key])}`)
+    .join(",")}}`;
 }
 
-export function generateSignature(params: any, secret: string): string {
-  const jsonParams = JSON.stringify(params);
+/**
+ * Generate HMAC-SHA1 signature compatible with
+ * Cloudflare Workers and Node.js.
+ */
+export function generateSignature(
+  params: Record<string, unknown>,
+  secret: string
+): string {
+  const payload = stableStringify(params);
 
-  const keyBytes = utf8ToBytes(secret);
-  const msgBytes = utf8ToBytes(jsonParams);
+  const signature = hmac(
+    sha1,
+    utf8ToBytes(secret),
+    utf8ToBytes(payload)
+  );
 
-  const sig = hmac(sha1, keyBytes, msgBytes);
+  return bytesToHex(signature);
+}
 
-  return toHex(sig);
+/**
+ * Fetch Transloadit assembly status
+ */
+export async function getAssemblyStatus(assemblyId: string) {
+  const authKey = import.meta.env.TRANSLOADIT_KEY;
+
+  if (!authKey) {
+    throw new Error("Missing TRANSLOADIT_KEY");
+  }
+
+  const response = await fetch(
+    `https://api2.transloadit.com/assemblies/${assemblyId}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch assembly status: ${response.status}`
+    );
+  }
+
+  return response.json();
 }
