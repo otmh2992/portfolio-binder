@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "wrangler pages dev dist",
+    "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
@@ -65,7 +65,6 @@
   },
   "devDependencies": {
     "@astrojs/check": "0.9.4",
-    "@cloudflare/workers-types": "4.20260523.1",
-    "wrangler": "4.94.0"
+    "@cloudflare/workers-types": "4.20260523.1"
   }
 }

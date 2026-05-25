@@ -6,8 +6,9 @@ export default defineConfig({
   output: "server",
 
   adapter: cloudflare({
+    imageService: "compile",
     platformProxy: {
-      enabled: true
+      enabled: false
     }
   }),
 
@@ -19,14 +20,6 @@ export default defineConfig({
         "webflow-api",
         "@aws-sdk/*"
       ]
-    },
-
-    build: {
-      rollupOptions: {
-        output: {
-          manualChunks: undefined
-        }
-      }
     }
   }
 });
