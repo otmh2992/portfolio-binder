@@ -6,7 +6,7 @@ import {
   checkOllamaStatus,
   getAvailableModels,
   streamChatWithOllama
-} from '../../lib/ollama';
+} from '../../../lib/ollama';
 
 export const prerender = false;
 

@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { createR2Client } from '../../lib/r2';
+import { createR2Client } from '../../../lib/r2';
 
 export const GET: APIRoute = async ({ locals }) => {
   const checks: any = {

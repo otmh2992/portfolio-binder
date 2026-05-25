@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { uploadToR2 } from "../../lib/r2";
+import { uploadToR2 } from "../../../lib/r2";
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {

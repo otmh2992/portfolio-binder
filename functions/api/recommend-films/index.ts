@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getRecommendedFilms } from '../../lib/tmdb';
+import { getRecommendedFilms } from '../../../lib/tmdb';
 
 /**
  * API endpoint for intelligent film recommendations
