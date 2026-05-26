@@ -3,23 +3,9 @@ import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 
 export default defineConfig({
-  output: "static",
+  output: "server",
 
-  adapter: cloudflare({
-    imageService: "compile",
-    platformProxy: {
-      enabled: false
-    }
-  }),
+  adapter: cloudflare(),
 
   integrations: [react()],
-
-  vite: {
-    ssr: {
-      external: [
-        "webflow-api",
-        "@aws-sdk/*"
-      ]
-    }
-  }
 });
